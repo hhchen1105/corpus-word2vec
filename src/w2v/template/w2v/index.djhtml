@@ -1,0 +1,5 @@
+<h3>中文 Word2Vec 測試</h3>
+
+<p>測試1：<a href="relevance">列出相似詞</a></p>
+<p>測試2：<a href="analogy">中文類比</a></p>
+<p>測試3：<a href="mismatch">找出最不相似的詞</a></p>

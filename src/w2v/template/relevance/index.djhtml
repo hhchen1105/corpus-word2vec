@@ -1,0 +1,31 @@
+<a href="/">[Home]</a>
+
+<p>
+<h4>相關詞：</h4>
+
+<form action="index" method="get">
+Based on {{form.selected_model}}, {{form.phrase1}} is relevant to ?
+<br><br>
+<input type="submit" value="Submit" />
+</form>
+</p>
+
+{% if results != None %}
+    <p>
+    <h4>Most likely results:</h4>
+    {% for result in results %}
+        <a href=index?phrase1={{result.0}}&selected_model={{selected_model}}>{{result.0}}</a> : {{result.1}} <br>
+    {% endfor %}
+    </p>
+{% elif msg != None %}
+    <p>{{ msg  }}</p>
+{% endif %}
+
+<p>
+<h4>範例：</h4>
+
+{% for phrase in sample_phrases %}
+    <a href="index?phrase1={{phrase}}&selected_model={{selected_model}}">{{phrase}}</a><br>
+{% endfor %}
+</p>
+

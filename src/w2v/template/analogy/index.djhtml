@@ -1,0 +1,30 @@
+<a href="/">[Home]</a>
+
+<p>
+<h4>中文類比：</h4>
+
+<form action="index" method="get">
+{{form.phrase1}} : {{form.phrase2}} = {{form.phrase3}} : ?
+<br><br>
+<input type="submit" value="Submit" />
+</form>
+</p>
+
+{% if results != None %}
+    <p>
+    <h4>Most likely results:</h4>
+    {% for result in results %}
+        {{result.0}} : {{result.1}} <br>
+    {% endfor %}
+    </p>
+{% elif msg != None %}
+    <p>{{ msg  }}</p>
+{% endif %}
+
+<p>
+<h4>範例：</h4>
+{% for phrases in analogy_examples %}
+    <a href="index?phrase1={{phrases.0}}&phrase2={{phrases.1}}&phrase3={{phrases.2}}">{{phrases.0}} : {{phrases.1}} = {{phrases.2}} : ?</a><br>
+{% endfor %}
+</p>
+

@@ -1,0 +1,27 @@
+<a href="/">[Home]</a>
+<p>
+<h4>輸入一串詞，自動找出最不相似的詞 (以','隔開每個詞)：</h4>
+
+<form action="index" method="get">
+{{form.phrases}}
+<br><br>
+<input type="submit" value="Submit" />
+</form>
+</p>
+
+{% if result != None %}
+    <p>
+    <h4>Most unlikely match:</h4>
+    {{result}}
+    </p>
+{% elif msg != None %}
+    <p>{{ msg  }}</p>
+{% endif %}
+
+<p>
+<h4>範例：</h4>
+{% for phrases in mismatch_examples %}
+<a href='index?phrases={{phrases|join:","}}'</a>{{phrases|join:","}}<br>
+{% endfor %}
+</p>
+
