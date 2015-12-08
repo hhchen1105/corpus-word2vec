@@ -58,7 +58,7 @@ class MySentences(object):
     def __iter__(self):
         for filename in self.docs:
             for line in open(filename):
-                yield line.decode('utf-8').split()
+                yield line[line.find(':::')+len(':::'):].decode('utf-8').split()
 
 
 def train_word2vec_model():
