@@ -10,6 +10,7 @@ Desc
 # Creation Date : 11-25-2015
 # Last Modified:
 
+import bz2
 import logging
 import sys
 
@@ -42,21 +43,28 @@ def check_args(argv):
     #    raise
 
 
-def process_zhwiki():
+def process_zhwiki(min_content_length=10):
     jieba.load_userdict('../var/tw-dict.dict')
-    wiki = gensim.corpora.WikiCorpus('../var/zhwiki-20150901-pages-articles.xml.bz2', dictionary={})
     i = 0
-    with open('../var/wiki_zh_text.txt', 'w') as f_out:
-        for article in wiki.get_texts():
-            try:
-                f_out.write(' '.join(
-                    [term for term in jieba.cut(
-                        opencc.convert(' '.join(article), 'zhs2zhtw_p.ini'), cut_all=False) if term != ' ']).encode('utf-8') + '\n')
-                i += 1
-            except:
-                pass
-            if i % 1000 == 0:
-                logger.info("Saved %i articles" % (i))
+    with open('../var/zhwiki_text.txt', 'w') as f_out:
+        for title, content, pageid in gensim.corpora.wikicorpus.extract_pages(
+                bz2.BZ2File('../var/zhwiki-20150901-pages-articles.xml.bz2'), filter_namespaces=('0',)):
+            content = gensim.corpora.wikicorpus.filter_wiki(content)
+            if len(content) >= min_content_length:
+                try:
+                    all_terms = [ ]
+                    content = content.lower().replace('\n', ' ')
+                    for sent in content.split():
+                        if all(([('a' <= t <= 'z') or ('0' <= t <= '9') for t in sent])):
+                            all_terms.append(sent)
+                        else:
+                            all_terms.extend([t for t in jieba.cut(opencc.convert(sent, 'zhs2zhtw_p.ini'), cut_all=False) if t != ' '])
+                    f_out.write('%s ::: %s\n' % (opencc.convert(title, 'zhs2zhtw_p.ini').encode('utf-8'), ' '.join(all_terms).encode('utf-8')))
+                    i += 1
+                except:
+                    pass
+                if i % 1000 == 0:
+                    logger.info("Saved %i articles" % (i))
 
     logger.info("Totally saved %i articles" % (i))
 
