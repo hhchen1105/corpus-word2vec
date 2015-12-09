@@ -58,20 +58,18 @@ def check_args(argv):
 class MyLabeledSentences(object):
     def __init__(self, docs):
         self.docs = [d.strip() for d in docs.split(',')]
-        self.i = 0
 
     def __iter__(self):
         for filename in self.docs:
             for line in open(filename):
-                self.i += 1
-                yield gensim.models.doc2vec.TaggedDocument(
-                    words=line[line.find(':::')+len(':::'):].decode('utf-8').split(),
-                    tags=[line[:line.find(':::')]])
+                words = line[(line.find(':::')+len(':::')):].decode('utf-8').split()
+                tags = [line[:line.find(':::')].strip()]
+                yield gensim.models.doc2vec.LabeledSentence(words=words, tags=tags)
 
 
 def train_doc2vec_model():
-    model = gensim.models.Doc2Vec(
-            MyLabeledSentences(FLAGS.train_docs), size=200, window=5, min_count=5, workers=multiprocessing.cpu_count())
+    model = gensim.models.Doc2Vec(MyLabeledSentences(FLAGS.train_docs),
+                                  size=200, window=5, min_count=5, workers=multiprocessing.cpu_count())
     model.save("%s" % (FLAGS.save_model))
     model.save_word2vec_format("%s.text.vector" % (FLAGS.save_model), binary=False)
 
