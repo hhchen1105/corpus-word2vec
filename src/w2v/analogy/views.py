@@ -25,7 +25,7 @@ def index(request):
     if request.method == 'GET':
         form = PhraseAnologyQueryForm(request.GET)
         if request.GET:
-            model = gensim.models.Word2Vec.load('../../var/zhwiki_word2vec.model')
+            model = gensim.models.Word2Vec.load('../../var/zhwiki.model')
             phrase1 = opencc.convert(request.GET['phrase1'], 'zhs2zhtw_p.ini').strip()
             phrase2 = opencc.convert(request.GET['phrase2'], 'zhs2zhtw_p.ini').strip()
             phrase3 = opencc.convert(request.GET['phrase3'], 'zhs2zhtw_p.ini').strip()

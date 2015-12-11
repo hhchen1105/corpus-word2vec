@@ -21,7 +21,7 @@ def index(request):
     if request.method == 'GET':
         form = PhraseAnologyQueryForm(request.GET)
         if request.GET:
-            model = gensim.models.Word2Vec.load('../../var/zhwiki_word2vec.model')
+            model = gensim.models.Word2Vec.load('../../var/zhwiki.model')
             phrases = [t.strip() for t in opencc.convert(request.GET['phrases'], 'zhs2zhtw_p.ini').split(',')]
             for phrase in phrases:
                 if phrase not in model.vocab:

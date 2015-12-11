@@ -9,7 +9,7 @@ import opencc
 class PhraseRelevanceQueryForm(forms.Form):
     available_models = (('../../var/zhwiki.model', '中文維基'),
                         ('../../var/momo.model', 'Momo商品敘述'),
-                        ('../../var/zhwiki-and-momo.model', 'both'),)
+                        ('../../var/zhwiki-and-momo.model', '中文維基 + Momo商品敘述'),)
     phrase1 = forms.CharField(max_length=10, widget=forms.TextInput(attrs={'size':10}))
     selected_model = forms.CharField(max_length=200, widget=forms.Select(choices=available_models))
 
