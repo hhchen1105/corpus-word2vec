@@ -10,6 +10,7 @@ Desc
 # Creation Date : 11-2-2015
 # Last Modified:
 
+import json
 import logging
 import multiprocessing
 import os
@@ -62,8 +63,13 @@ class MySentences(object):
 
 
 def train_word2vec_model():
-    model = gensim.models.Word2Vec(
-            MySentences(FLAGS.train_docs), size=200, window=5, min_count=5, workers=multiprocessing.cpu_count())
+    w2v_args = json.load(open('../etc/w2v_settings.py'))
+    model = gensim.models.Word2Vec(MySentences(FLAGS.train_docs),
+                                   size=w2v_args['hidden_vector_dim'],
+                                   window=w2v_args['window_len'],
+                                   min_count=w2v_args['min_word_count'],
+                                   iter=w2v_args['iters'],
+                                   workers=multiprocessing.cpu_count())
     model.save("%s" % (FLAGS.save_model))
     model.save_word2vec_format("%s.text.vector" % (FLAGS.save_model), binary=False)
 
