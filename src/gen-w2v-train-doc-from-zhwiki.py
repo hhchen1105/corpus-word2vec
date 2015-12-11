@@ -13,6 +13,7 @@ Desc
 import bz2
 import logging
 import sys
+import unicodedata
 
 import gensim
 import gflags
@@ -43,6 +44,27 @@ def check_args(argv):
     #    raise
 
 
+def keep_acceptable_chars(unistr):
+    def is_accepted_char(uchar):
+        if unicodedata.name(uchar).startswith('CJK'):
+            return True
+        if unicodedata.name(uchar).startswith('LATIN'):
+            return True
+        if unicodedata.name(uchar).startswith('SPACE'):
+            return True
+        if unicodedata.name(uchar).startswith('DIGIT'):
+            return True
+        if unicodedata.name(uchar).startswith('GREEK'):
+            return True
+        return False
+
+    return ''.join([uchar if uchar.isalpha() and is_accepted_char(uchar) else ' ' for uchar in unistr])
+
+
+def regularize_content(unistr):
+    return unistr.lower()
+
+
 def process_zhwiki(min_content_length=10):
     jieba.load_userdict('../var/tw-dict.dict')
     i = 0
@@ -50,16 +72,14 @@ def process_zhwiki(min_content_length=10):
         for title, content, pageid in gensim.corpora.wikicorpus.extract_pages(
                 bz2.BZ2File('../var/zhwiki-20150901-pages-articles.xml.bz2'), filter_namespaces=('0',)):
             content = gensim.corpora.wikicorpus.filter_wiki(content)
+            content = opencc.convert(content, 'zhs2zhtw_p.ini')
+            content = keep_acceptable_chars(content)
+            content = regularize_content(content)
             if len(content) >= min_content_length:
                 try:
-                    all_terms = [ ]
-                    content = content.lower().replace('\n', ' ')
-                    for sent in content.split():
-                        if all(([('a' <= t <= 'z') or ('0' <= t <= '9') for t in sent])):
-                            all_terms.append(sent)
-                        else:
-                            all_terms.extend([t for t in jieba.cut(opencc.convert(sent, 'zhs2zhtw_p.ini'), cut_all=False) if t != ' '])
-                    f_out.write('%s ::: %s\n' % (opencc.convert(title, 'zhs2zhtw_p.ini').encode('utf-8'), ' '.join(all_terms).encode('utf-8')))
+                    tag = opencc.convert(title, 'zhs2zhtw_p.ini')
+                    doc_content = ' '.join([t for t in jieba.cut(content, cut_all=False) if t != ' '])
+                    f_out.write('%s ::: %s\n' % (tag.encode('utf-8'), doc_content.encode('utf-8')))
                     i += 1
                 except:
                     pass
