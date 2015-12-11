@@ -10,6 +10,7 @@ Desc
 # Creation Date : 11-2-2015
 # Last Modified:
 
+import json
 import logging
 import multiprocessing
 import os
@@ -17,6 +18,7 @@ import sys
 
 import gensim
 import gflags
+
 
 FLAGS = gflags.FLAGS
 gflags.DEFINE_string('train_docs', '', '')
@@ -68,8 +70,24 @@ class MyLabeledSentences(object):
 
 
 def train_doc2vec_model():
-    model = gensim.models.Doc2Vec(MyLabeledSentences(FLAGS.train_docs),
-                                  size=200, window=5, min_count=5, workers=multiprocessing.cpu_count())
+    w2v_args = json.load(open('../etc/w2v_settings.py'))
+    alpha = w2v_args['alpha']
+    alpha_delta = (alpha - w2v_args['min_alpha']) / w2v_args['iters']
+    sentences = MyLabeledSentences(FLAGS.train_docs)
+    model = gensim.models.Doc2Vec(size=w2v_args['hidden_vector_dim'],
+                                  window=w2v_args['window_len'],
+                                  min_count=w2v_args['min_word_count'],
+                                  alpha=alpha, min_alpha=w2v_args['min_alpha'],
+                                  workers=multiprocessing.cpu_count())
+    model.build_vocab(sentences)
+
+    for epoch in xrange(w2v_args['iters']):
+        logger.info("epoch %i / %i" % (epoch+1, w2v_args['iters']))
+        # train
+        model.alpha, model.min_alpha = alpha, alpha
+        model.train(sentences)
+        alpha -= alpha_delta
+
     model.save("%s" % (FLAGS.save_model))
     model.save_word2vec_format("%s.text.vector" % (FLAGS.save_model), binary=False)
 
