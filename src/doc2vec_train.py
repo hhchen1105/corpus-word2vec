@@ -64,7 +64,7 @@ class MyLabeledSentences(object):
     def __iter__(self):
         for filename in self.docs:
             for line in open(filename):
-                words = line[(line.find(':::')+len(':::')):].decode('utf-8').split()
+                words = line[(line.find(':::')+len(':::')):].split()
                 tags = [line[:line.find(':::')].strip()]
                 yield gensim.models.doc2vec.LabeledSentence(words=words, tags=tags)
 
