@@ -78,8 +78,8 @@ def process_zhwiki(min_content_length=10):
             if len(content) >= min_content_length:
                 try:
                     tag = opencc.convert(title, 'zhs2zhtw_p.ini')
-                    doc_content = ' '.join([t for t in jieba.cut(content, cut_all=False) if t != ' '])
-                    f_out.write('%s ::: %s\n' % (tag.encode('utf-8'), doc_content.encode('utf-8')))
+                    content = ' '.join([t for t in jieba.cut(content, cut_all=False) if t != ' '])
+                    f_out.write('%s ::: %s\n' % (tag.encode('utf-8'), content.encode('utf-8')))
                     i += 1
                 except:
                     pass
